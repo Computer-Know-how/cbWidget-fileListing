@@ -65,7 +65,7 @@ component extends="contentbox.model.ui.BaseWidget" singleton{
 				');
 
 				for (var x=1; x lte listing.recordcount; x++) {
-					if( listing.type eq "File" ) {
+					if( listing.type[x] eq "File" ) {
 						// row
 						writeOutput('
 							<tr>
