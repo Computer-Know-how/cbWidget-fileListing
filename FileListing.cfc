@@ -1,20 +1,20 @@
 /**
 * A widget that renders a listing of the files in a folder.
 */
-component extends="contentbox.model.ui.BaseWidget" singleton{
+component extends="contentbox.models.ui.BaseWidget" singleton{
 
 	FileListing function init(controller){
 		// super init
 		super.init(controller);
 
 		// Widget Properties
-		setPluginName("FileListing");
-		setPluginVersion("1.0");
-		setPluginDescription("A widget that renders a listing of the files in a folder.");
+		setName("FileListing");
+		setVersion("1.0");
+		setDescription("A widget that renders a listing of the files in a folder.");
 		setForgeBoxSlug("cbwidget-filelisting");
-		setPluginAuthor("Computer Know How");
-		setPluginAuthorURL("http://www.compknowhow.com");
-		setIcon( "list.png" );
+		setAuthor("Computer Know How");
+		setAuthorURL("http://www.compknowhow.com");
+		setIcon( "list" );
 		setCategory( "Utilities" );
 		return this;
 	}
