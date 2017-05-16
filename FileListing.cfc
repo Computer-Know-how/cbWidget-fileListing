@@ -35,6 +35,8 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 		var mediaRoot = expandPath(cbSettings.cb_media_directoryRoot);
 		var mediaPath = "modules" & cbSettings.cb_media_directoryRoot & "/" & arguments.folder;
 		var mediaPathExpanded = expandPath(mediaPath);
+		var displayMediaPath = "__media";
+		if (arguments.folder neq "") { displayMediaPath &= "/" & arguments.folder; }
 
 		//security check - can't be higher then the media root
 		if(!findNoCase(mediaRoot, mediaPathExpanded)){
@@ -98,10 +100,12 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 								<tr>
 									<td class="cb-filelisting-name">');
 
+							var link = event.buildLink(displayMediaPath) & "/" & listing.name[x];
+
 							if(showIcons) {
-								writeOutput('<a href="#mediaPath#/#listing.name[x]#" target="_blank">' & iconString & '</a> <a href="#mediaPath#/#listing.name[x]#" target="_blank">#listing.name[x]#</a>');
+								writeOutput('<a href="#link#" target="_blank">' & iconString & '</a> <a href="#link#" target="_blank">#listing.name[x]#</a>');
 							} else {
-								writeOutput('<a href="#mediaPath#/#listing.name[x]#" target="_blank">#listing.name[x]#</a>');
+								writeOutput('<a href="#link#" target="_blank">#listing.name[x]#</a>');
 							}
 
 							writeOutput('
