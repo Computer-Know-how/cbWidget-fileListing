@@ -9,7 +9,7 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 
 		// Widget Properties
 		setName("FileListing");
-		setVersion("1.1");
+		setVersion("1.2");
 		setDescription("A widget that renders a listing of the files in a folder.");
 		setForgeBoxSlug("cbwidget-filelisting");
 		setAuthor("Computer Know How");
@@ -33,7 +33,7 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 		var cbSettings = event.getValue(name="cbSettings",private=true);
 		var sortOrder = arguments.sort & " " & arguments.order;
 		var mediaRoot = expandPath(cbSettings.cb_media_directoryRoot);
-		var mediaPath = "modules" & cbSettings.cb_media_directoryRoot & "/" & arguments.folder;
+		var mediaPath = cbSettings.cb_media_directoryRoot & "/" & arguments.folder;
 		var mediaPathExpanded = expandPath(mediaPath);
 		var displayMediaPath = "__media";
 		if (arguments.folder neq "") { displayMediaPath &= "/" & arguments.folder; }
@@ -44,7 +44,7 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 		}
 
 		if (directoryExists(mediaPathExpanded)) {
-			var listing = directoryList(mediaPathExpanded,false,"query",arguments.filter,sortOrder);
+			var listing = directoryList(mediaPath,false,"query",formatFilter(arguments.filter),sortOrder);
 
 			// generate file listing
 			saveContent variable="rString"{
@@ -72,29 +72,6 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 
 					for (var x=1; x lte listing.recordcount; x++) {
 						if( listing.type[x] eq "File" ) {
-							if(showIcons) {
-								var fileExt = listLast(listing.name[x],".");
-
-								switch(fileExt) {
-									case "mp3": case "wav":
-										iconString = "<i class='fa fa-file-audio-o'></i>";
-										break;
-									case "pdf":
-										iconString = "<i class='fa fa-file-pdf-o'></i>";
-										break;
-									case "doc": case "docx":
-										iconString = "<i class='fa fa-file-word-o'></i>";
-										break;
-									case "jpg": case "gif": case "png": case "bmp":
-										iconString = "<i class='fa fa-file-image-o'></i>";
-										break;
-									case "ppt": case "pptx":
-										iconString = "<i class='fa fa-file-powerpoint-o'></i>";
-										break;
-									default:
-										iconString = "";
-								}
-							}
 							// row
 							writeOutput('
 								<tr>
@@ -103,7 +80,7 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 							var link = event.buildLink(displayMediaPath) & "/" & listing.name[x];
 
 							if(showIcons) {
-								writeOutput('<a href="#link#" target="_blank">' & iconString & '</a> <a href="#link#" target="_blank">#listing.name[x]#</a>');
+								writeOutput('<a href="#link#" target="_blank">' & fileIcon(listLast(listing.name[x],".")) & '</a> <a href="#link#" target="_blank">#listing.name[x]#</a>');
 							} else {
 								writeOutput('<a href="#link#" target="_blank">#listing.name[x]#</a>');
 							}
@@ -111,15 +88,7 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 							writeOutput('
 									</td>
 									<td class="cb-filelisting-size">
-							');
-
-							if( listing.size[x] GT 1000 ) {
-								writeOutput('#numberFormat(listing.size[x]/1000)# KB');
-							} else {
-								writeOutput('#decimalFormat(listing.size[x]/1000)# KB');
-							}
-
-							writeOutput('
+										#formatFileSize(listing.size[x])#
 									</td>
 									<td class="cb-filelisting-modified">
 										#dateFormat(listing.datelastmodified[x],'m/d/yyyy')#
@@ -151,6 +120,50 @@ component extends="contentbox.models.ui.BaseWidget" singleton{
 			return "The folder could not be found for listing";
 		}
 
+	}
+
+	private string function formatFilter(required filter){
+		return REReplace(replace(arguments.filter," ",""),",","|");
+	}
+
+	private string function formatFileSize(required fileSize){
+		var formattedFileSize = "";
+
+		if( arguments.fileSize LT 1024 ) {
+			formattedFileSize = decimalFormat(arguments.fileSize/1024) & " KB"
+		} else if( arguments.fileSize GTE 1024 and arguments.fileSize LT 1048576) {
+			formattedFileSize = decimalFormat(arguments.fileSize/1024) & " KB"
+		} else if( arguments.fileSize GTE 1048576 and arguments.fileSize LT 1073741824) {
+			formattedFileSize = decimalFormat(arguments.fileSize/1048576) & " MB"
+		} else if( arguments.fileSize GTE 1073741824) {
+			formattedFileSize = decimalFormat(listing.size[x]/1073741824) & " GB"
+		}
+
+		return formattedFileSize;
+	}
+
+	private string function fileIcon(required fileExtension){
+		var iconString = "";
+
+		switch(arguments.fileExtension) {
+			case "mp3": case "wav":
+				iconString = "<i class='fa fa-file-audio-o'></i>";
+				break;
+			case "pdf":
+				iconString = "<i class='fa fa-file-pdf-o'></i>";
+				break;
+			case "doc": case "docx":
+				iconString = "<i class='fa fa-file-word-o'></i>";
+				break;
+			case "jpg": case "gif": case "png": case "bmp":
+				iconString = "<i class='fa fa-file-image-o'></i>";
+				break;
+			case "ppt": case "pptx":
+				iconString = "<i class='fa fa-file-powerpoint-o'></i>";
+				break;
+		}
+
+		return iconString;
 	}
 
 }
